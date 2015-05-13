@@ -1,6 +1,7 @@
 var UserRepository = require('./user.js');
 var MessageRepository = require('./message.js');
 var qs = require('querystring');
+var crypto = require('crypto');
 module.exports = {
 
     getUsers : function(request,response,next){
@@ -28,6 +29,9 @@ module.exports = {
         req.on('end', function() {
             var user = JSON.parse(data);
             if(!isEmpty(user)){
+                var hash = crypto.createHmac('sha512', 'datekey')
+                hash.update(user.password);
+                user.password = hash.digest('hex');
                 UserRepository.find(user,function(user){
                     if(user!=null){
                         response.json(user);
@@ -65,6 +69,9 @@ module.exports = {
                     }
                 });
                 if(!exist){
+                    var hash = crypto.createHmac('sha512', 'datekey')
+                    hash.update(user.password);
+                    user.password = hash.digest('hex');
                     UserRepository.save(user,function(user){
                         console.log("Insertion réussi");
                         response.json(user);
@@ -130,8 +137,8 @@ module.exports = {
     deleteUsers : function(req,response,next){
 
             id=req.params.id;
-            console.log('deleteCustomers : id='+id);
-            CustomerRepository.delete(id,function(err,deleted){
+            console.log('deleteUser : id='+id);
+            UserRepository.delete(id,function(err,deleted){
                 response.json({
                     id      : id,
                     success : deleted && !err

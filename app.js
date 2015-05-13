@@ -20,6 +20,7 @@ var path = require('path');
 var io = require('socket.io')(server);
 var morgan      = require('morgan');
 var bodyParser  = require('body-parser');
+var crypto = require('crypto');
 global.mongoose = require('mongoose');
 
 var router = express.Router();
@@ -83,7 +84,6 @@ MessageRepository.findAll(function(messages){
 var usersOnline = [];
 var usersSearchFights=[];
 var clients=[];
-console.log(usersOnline);
 /**
  * Launch Server
  */
