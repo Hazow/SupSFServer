@@ -83,6 +83,7 @@ MessageRepository.findAll(function(messages){
 var usersOnline = [];
 var usersSearchFights=[];
 var clients=[];
+console.log(usersOnline);
 /**
  * Launch Server
  */
@@ -151,8 +152,8 @@ io.sockets.on('connection', function (socket) {
                     if(soc.user.pseudo==user.pseudo){
                         find=true;
                         usersSearchFights.splice(usersSearchFights.splice(user),1);
-                        socket.emit('findFight',user);
-                        soc.emit('findFight',socket.user);
+                        socket.emit('findFight',{ user : user, pos : "right"});
+                        soc.emit('findFight',{ user : socket.user, pos : "left"});
                         console.log(socket.user.pseudo+" will fight "+soc.user.pseudo);
                     }
                 });
@@ -197,6 +198,49 @@ io.sockets.on('connection', function (socket) {
         });
     });
 
+    socket.on('event', function(data) {
+        clients.forEach(function(soc){
+            if(soc.user._id==data.opponent._id){
+                soc.emit('eventOpponent',data.event);
+            }
+        });
+        socket.emit('event', data.event);
+    });
+
+    socket.on('correctLatency', function(data) {
+        clients.forEach(function(soc){
+            if(soc.user._id==data.opponent._id){
+                soc.emit('correctLatency',{
+                    x:data.x,
+                    y:data.y,
+                    minX:data.minX,
+                    maxX:data.maxX,
+                    minY:data.minY,
+                    maxY:data.maxY,
+                    status:data.status,
+                    position:data.position,
+                    specialload:data.specialload,
+                    or:data.or,
+                    frame:data.frame,
+                    life:data.life,
+                    isHurting:data.isHurting
+                });
+            }
+        });
+    });
+
+    socket.on('stopFight', function(opponent) {
+        clients.forEach(function(soc){
+            if(soc.user._id==opponent._id){
+                soc.emit('stopFight');
+            }
+        });
+    });
+
+    socket.on('majLeaderBoard', function(user){
+        socket.emit('majLeaderBoard',user);
+        socket.broadcast.emit('majLeaderBoard',user);
+    });
 
 });
 
