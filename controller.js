@@ -57,13 +57,28 @@ module.exports = {
             var user = JSON.parse(data);
 
             console.log(user);
-            UserRepository.save(user,function(user){
-                console.log("Insertion réussi");
-                response.json(user);
-            },function(err){
-                console.log("Insertion failed : "+err);
-                response.send(err);
+            var exist=false;
+            UserRepository.findAll(function(users){
+                users.forEach(function(entity){
+                    if(entity.pseudo==user.pseudo){
+                        exist=true;
+                    }
+                });
+                if(!exist){
+                    UserRepository.save(user,function(user){
+                        console.log("Insertion réussi");
+                        response.json(user);
+                    },function(err){
+                        console.log("Insertion failed : "+err);
+                        response.send(err);
+                    });
+                }else{
+                    response.send(false);
+                }
             });
+
+
+
         });
 
     },
@@ -98,12 +113,12 @@ module.exports = {
         });
         req.on('end', function() {
             console.log(data);
-            var customer = JSON.parse(data);
-            id=customer.id;
+            var user = JSON.parse(data);
+            id=user._id;
             console.log('updateCustomer : id='+id);
-            CustomerRepository.update(id,customer,function(customer){
+            UserRepository.update(id,user,function(user){
                 console.log("Update réussi");
-                response.json(customer);
+                response.json(user);
             },function(err){
                 console.log("Update failed" +err);
                 response.send(err);
