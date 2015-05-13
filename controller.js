@@ -7,7 +7,7 @@ module.exports = {
     getUsers : function(request,response,next){
         console.log('getUsers');
         UserRepository.findAll(function(users){
-            console.log(users);
+            //console.log(users);
             response.json(users);
         })
     },
@@ -119,10 +119,10 @@ module.exports = {
             data += chunk;
         });
         req.on('end', function() {
-            console.log(data);
+            //console.log(data);
             var user = JSON.parse(data);
             id=user._id;
-            console.log('updateCustomer : id='+id);
+            console.log('updateUser : id='+id);
             UserRepository.update(id,user,function(user){
                 console.log("Update réussi");
                 response.json(user);
